@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: open-meteo-tracker
+  namespace: default
+spec:
+  schedule: "0 * * * *"   # once per hour
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 10
+  failedJobsHistoryLimit: 10
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: open-meteo-tracker
+              image: ghcr.io/qkn2ua/open-meteo-pipeline:latest
+              imagePullPolicy: Always
+              env:
+                - name: S3_BUCKET
+                  value: "data-proj-3"
+                - name: AWS_REGION
+                  value: "us-east-1"
+                - name: LATITUDE
+                  value: "38.0293"
+                - name: LONGITUDE
+                  value: "-78.4767"
+                - name: TIMEZONE
+                  value: "auto"
+                - name: DATA_KEY
+                  value: "data.csv"
+                - name: PLOT_KEY
+                  value: "plot.png"
